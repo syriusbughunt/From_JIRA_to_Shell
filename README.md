@@ -74,4 +74,9 @@ type:
 python -c 'import pty; pty.spawn("/bin/bash")'
 ``` 
 
-Here is your fully interactive PTY shell.
+Here is your fully interactive PTY shell.  
+  
+## 0x04 : Conclusion
+Running a Java Web Application with no or poor credentials exposed to the internet might not be a good idea. As shown above, it could potentially get our network compromised. What is the biggest threat to data security? I would say, in one word; humans. Even in 2018, we can still see servers running with credentials like *admin:admin*, *admin:123456*, *test:test* which means there is still a big learning curve for our admin/users. If you have any questions on that subject, don't hesitate to contact me.  
+  
+E-mail: syriusbughunt@protonmail.com
